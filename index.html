@@ -1185,7 +1185,12 @@ async function fetchRealMarketData() {
     { symbol: 'VIXY', label: 'VIX (VIXY)',     region: 'VOL' }
   ];
 
+  function sleep(ms) { return new Promise(function(r){ setTimeout(r,ms); }); }
+  var callCount = 0;
+
   for (const idx of indices) {
+    if (callCount > 0) await sleep(1500);
+    callCount++;
     try {
       const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${idx.symbol}&apikey=${apiKey}`;
       const res = await fetchWithTimeout(url, {}, 8000);
