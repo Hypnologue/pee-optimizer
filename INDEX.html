@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEE Optimizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root {
+  --bg: #0d0f14;
+  --bg2: #13161e;
+  --bg3: #1a1e28;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #e8eaf0;
+  --text2: #8b90a0;
+  --text3: #555a6a;
+  --accent: #4ade80;
+  --accent2: #22c55e;
+  --red: #f87171;
+  --amber: #fbbf24;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+  --card-r: 16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+}
+
+/* LOGIN SCREEN */
+.login-screen {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.login-box {
+  width: 100%; max-width: 360px;
+  background: var(--bg2);
+  border: 0.5px solid var(--border2);
+  border-radius: 24px;
+  padding: 40px 32px;
+  text-align: center;
+}
+.login-icon {
+  width: 64px; height: 64px; border-radius: 18px;
+  background: rgba(74,222,128,0.1);
+  border: 0.5px solid rgba(74,222,128,0.2);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 28px; color: var(--accent);
+}
+.login-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.login-sub { font-size: 13px; color: var(--text3); margin-bottom: 32px; font-family: 'DM Mono', monospace; }
+.login-input {
+  width: 100%; padding: 14px 16px;
+  background: var(--bg3); border: 0.5px solid var(--border2);
+  border-radius: 12px; color: var(--text);
+  font-size: 16px; font-family: 'DM Mono', monospace;
+  outline: none; text-align: center;
+  letter-spacing: 3px; margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+.login-input:focus { border-color: var(--accent); }
+.login-input.error { border-color: var(--red); animation: shake 0.3s; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+.login-btn {
+  width: 100%; padding: 14px;
+  background: var(--accent); color: #0d0f14;
+  border: none; border-radius: 12px; cursor: pointer;
+  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+  transition: all 0.15s; margin-bottom: 16px;
+}
+.login-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+.login-btn:active { transform: translateY(0); }
+.login-remember {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; font-size: 12px; color: var(--text3); cursor: pointer;
+}
+.login-remember input { cursor: pointer; accent-color: var(--accent); }
+.login-error {
+  font-size: 12px; color: var(--red);
+  margin-bottom: 12px; height: 16px;
+  font-family: 'DM Mono', monospace;
+}
+.login-attempts {
+  font-size: 11px; color: var(--text3);
+  margin-top: 20px; font-family: 'DM Mono', monospace;
+}
+.mono { font-family: 'DM Mono', monospace; }
+
+/* LAYOUT */
+.app { max-width: 480px; margin: 0 auto; padding: 0 0 100px; }
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,15,20,0.92);
+  backdrop-filter: blur(12px);
+  padding: 16px 20px;
+  border-bottom: 0.5px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-title { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+.topbar-sub { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.settings-btn {
+  width: 36px; height: 36px; border-radius: 10px;
+  border: 0.5px solid var(--border2); background: var(--bg3);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--text2); font-size: 18px; transition: all 0.15s;
+}
+.settings-btn:hover { background: var(--bg2); color: var(--text); }
+
+/* NAV */
+.nav {
+  display: flex; gap: 4px;
+  padding: 12px 20px; border-bottom: 0.5px solid var(--border);
+  background: var(--bg);
+  position: sticky; top: 65px; z-index: 99;
+}
+.nav-btn {
+  flex: 1; padding: 8px 4px; border-radius: 10px;
+  border: none; background: transparent; cursor: pointer;
+  color: var(--text3); font-size: 11px; font-family: 'Syne', sans-serif;
+  font-weight: 500; display: flex; flex-direction: column;
+  align-items: center; gap: 4px; transition: all 0.15s;
+}
+.nav-btn i { font-size: 20px; }
+.nav-btn.active { background: var(--bg3); color: var(--text); }
+.nav-btn:hover:not(.active) { color: var(--text2); }
+
+/* SECTIONS */
+.section { display: none; padding: 20px; }
+.section.active { display: block; }
+
+/* SCORE CARD */
+.score-hero {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 24px;
+  margin-bottom: 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.score-hero::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(74,222,128,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.score-date { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 16px; }
+.score-circle {
+  width: 120px; height: 120px; border-radius: 50%;
+  margin: 0 auto 16px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  border: 2px solid var(--accent);
+  position: relative;
+}
+.score-circle.orange { border-color: var(--amber); }
+.score-circle.red-c { border-color: var(--red); }
+.score-number { font-size: 36px; font-weight: 700; line-height: 1; }
+.score-label { font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.score-verdict { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.score-verdict.green { color: var(--accent); }
+.score-verdict.orange { color: var(--amber); }
+.score-verdict.red-v { color: var(--red); }
+.score-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* TAGS */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; justify-content: center; }
+.tag {
+  font-size: 11px; font-family: 'DM Mono', monospace;
+  padding: 4px 10px; border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--border2);
+  color: var(--text2);
+}
+.tag.pos { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.2); color: var(--accent); }
+.tag.neg { background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.2); color: var(--red); }
+.tag.neu { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.2); color: var(--amber); }
+
+/* CARDS */
+.card {
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.card-title i { font-size: 16px; }
+.badge {
+  font-size: 10px; font-family: 'DM Mono', monospace;
+  padding: 3px 8px; border-radius: 6px;
+  font-weight: 500;
+}
+.badge-green { background: rgba(74,222,128,0.15); color: var(--accent); }
+.badge-red { background: rgba(248,113,113,0.15); color: var(--red); }
+.badge-amber { background: rgba(251,191,36,0.15); color: var(--amber); }
+.badge-blue { background: rgba(96,165,250,0.15); color: var(--blue); }
+.badge-gray { background: rgba(255,255,255,0.06); color: var(--text2); }
+
+/* ACTION BOX */
+.action-box {
+  background: var(--bg3);
+  border: 0.5px solid var(--border2);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 12px;
+}
+.action-title { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; margin-bottom: 12px; letter-spacing: 0.5px; }
+.action-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.action-row:last-child { border-bottom: none; }
+.action-fund { font-size: 13px; color: var(--text); }
+.action-pct { font-size: 14px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--accent); }
+.action-steps { margin-top: 12px; }
+.action-step {
+  display: flex; gap: 10px;
+  font-size: 12px; color: var(--text2);
+  padding: 5px 0; align-items: flex-start;
+}
+.step-num {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-family: 'DM Mono', monospace;
+  flex-shrink: 0; margin-top: 1px; color: var(--text);
+}
+
+/* BUTTONS */
+.btn {
+  width: 100%; padding: 14px;
+  border-radius: 12px; border: none; cursor: pointer;
+  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600;
+  transition: all 0.15s; display: flex; align-items: center;
+  justify-content: center; gap: 8px; margin-top: 10px;
+}
+.btn-primary { background: var(--accent); color: #0d0f14; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary {
+  background: transparent; color: var(--text2);
+  border: 0.5px solid var(--border2);
+}
+.btn-secondary:hover { background: var(--bg3); color: var(--text); }
+.btn-copy {
+  background: transparent; color: var(--blue);
+  border: 0.5px solid rgba(96,165,250,0.2);
+}
+.btn-copy:hover { background: rgba(96,165,250,0.08); }
+
+/* REBALANCE TABLE */
+.rebal-table { width: 100%; border-collapse: collapse; }
+.rebal-table th {
+  font-size: 10px; font-family: 'DM Mono', monospace;
+  color: var(--text3); text-align: left; padding: 4px 0 8px;
+  border-bottom: 0.5px solid var(--border);
+}
+.rebal-table th:not(:first-child) { text-align: right; }
+.rebal-table td { padding: 10px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+.rebal-table tr:last-child td { border-bottom: none; }
+.rebal-table td:not(:first-child) { text-align: right; font-family: 'DM Mono', monospace; }
+.fund-name { font-size: 12px; color: var(--text); line-height: 1.3; }
+.fund-short { font-size: 10px; color: var(--text3); }
+.diff-pos { color: var(--red); }
+.diff-neg { color: var(--accent); }
+.diff-ok { color: var(--text3); }
+
+/* CREDITS */
+.credits-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.credit-dot {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.credit-used { background: var(--bg3); border: 0.5px solid var(--border); color: var(--text3); }
+.credit-avail { background: rgba(74,222,128,0.12); border: 0.5px solid rgba(74,222,128,0.3); color: var(--accent); }
+
+/* PROGRESS BAR */
+.progress-bar {
+  height: 4px; background: var(--bg3); border-radius: 2px;
+  overflow: hidden; margin-top: 8px;
+}
+.progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.6s; }
+
+/* INPUTS */
+.input-group { margin-bottom: 14px; }
+.input-label {
+  font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace;
+  margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;
+}
+.input-target { color: var(--text2); }
+.input-diff { font-size: 11px; font-family: 'DM Mono', monospace; }
+.fund-input {
+  width: 100%; padding: 10px 14px;
+  background: var(--bg3); border: 0.5px solid var(--border2);
+  border-radius: 10px; color: var(--text);
+  font-size: 14px; font-family: 'DM Mono', monospace;
+  outline: none; transition: border-color 0.15s;
+}
+.fund-input:focus { border-color: var(--accent); }
+.fund-input-row { display: flex; align-items: center; gap: 10px; }
+.fund-input-row .fund-input { flex: 1; }
+.pct-suffix { font-size: 13px; color: var(--text3); font-family: 'DM Mono', monospace; }
+
+/* STAT ROWS */
+.stat-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 0.5px solid var(--border);
+  font-size: 13px;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: var(--text2); }
+.stat-value { font-family: 'DM Mono', monospace; font-weight: 500; }
+.stat-value.green { color: var(--accent); }
+.stat-value.amber { color: var(--amber); }
+.stat-value.blue { color: var(--blue); }
+
+/* HISTORY */
+.history-item {
+  padding: 14px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.history-item:last-child { border-bottom: none; }
+.history-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.history-date { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text3); }
+.history-action { font-size: 13px; font-weight: 500; }
+.history-detail { font-size: 12px; color: var(--text2); }
+
+/* SETTINGS */
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; border-bottom: 0.5px solid var(--border);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 13px; }
+.setting-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.toggle {
+  width: 44px; height: 26px; border-radius: 13px;
+  background: var(--bg3); border: 0.5px solid var(--border2);
+  position: relative; cursor: pointer; transition: background 0.2s;
+}
+.toggle.on { background: var(--accent); border-color: var(--accent); }
+.toggle-thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: white; transition: transform 0.2s;
+}
+.toggle.on .toggle-thumb { transform: translateX(18px); }
+.select-small {
+  background: var(--bg3); border: 0.5px solid var(--border2);
+  border-radius: 8px; padding: 6px 10px;
+  color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px;
+  outline: none; cursor: pointer;
+}
+.api-input {
+  width: 100%; padding: 10px 14px;
+  background: var(--bg3); border: 0.5px solid var(--border2);
+  border-radius: 10px; color: var(--text);
+  font-size: 12px; font-family: 'DM Mono', monospace;
+  outline: none; margin-top: 8px;
+}
+.api-input:focus { border-color: var(--purple); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: var(--bg3); border: 0.5px solid var(--border2);
+  border-radius: 12px; padding: 12px 20px;
+  font-size: 13px; color: var(--text);
+  z-index: 1000; opacity: 0; transition: opacity 0.3s;
+  white-space: nowrap; pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* PLACED STATUS */
+.placed-banner {
+  background: rgba(74,222,128,0.08);
+  border: 0.5px solid rgba(74,222,128,0.2);
+  border-radius: 12px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+}
+.placed-icon { font-size: 24px; color: var(--accent); }
+.placed-text { flex: 1; }
+.placed-title { font-size: 13px; font-weight: 600; color: var(--accent); }
+.placed-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  z-index: 200; display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg2); border: 0.5px solid var(--border2);
+  border-radius: 20px; padding: 24px; width: 100%; max-width: 440px;
+  max-height: 80vh; overflow-y: auto;
+}
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+.modal-close { cursor: pointer; color: var(--text3); font-size: 20px; }
+.modal-close:hover { color: var(--text); }
+
+/* SECTION TITLE */
+.section-title { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text3); margin-bottom: 12px; letter-spacing: 0.5px; }
+
+/* LOADING */
+.loading {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px; font-size: 13px; color: var(--text2);
+}
+.spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--border2);
+  border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* FORECAST */
+.forecast-row { display: flex; gap: 8px; margin-top: 12px; }
+.forecast-col {
+  flex: 1; background: var(--bg3); border-radius: 10px;
+  padding: 10px; text-align: center;
+}
+.forecast-pct { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.forecast-label { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+/* ICS AREA */
+.ics-info {
+  background: var(--bg3); border-radius: 10px; padding: 14px;
+  font-size: 12px; color: var(--text2); margin-top: 12px; line-height: 1.6;
+}
+
+/* ANALYSIS STATUS BAR */
+.analysis-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; background: var(--bg3);
+  border-radius: 10px; margin-bottom: 12px;
+  font-size: 12px; color: var(--text2);
+}
+</style>
+</head>
+<body>
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-icon"><i class="ti ti-lock"></i></div>
+    <div class="login-title">PEE Optimizer</div>
+    <div class="login-sub">Acces securise</div>
+    <input type="password" class="login-input" id="login-input" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter') tryLogin()">
+    <div class="login-error" id="login-error"></div>
+    <button class="login-btn" onclick="tryLogin()"><i class="ti ti-lock-open" style="margin-right:6px"></i>Deverrouiller</button>
+    <label class="login-remember"><input type="checkbox" id="remember-me" checked> Rester connecte sur cet appareil</label>
+    <div class="login-attempts" id="login-attempts"></div>
+  </div>
+</div>
+
+
+<div class="app" id="main-app" style="display:none">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">PEE Optimizer</div>
+      <div class="topbar-sub mono" id="topbar-date">...</div>
+    </div>
+    <button class="settings-btn" onclick="openSettings()"><i class="ti ti-settings"></i></button>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showSection('dashboard',this)">
+      <i class="ti ti-chart-dots"></i>Dashboard
+    </button>
+    <button class="nav-btn" onclick="showSection('rebalance',this)">
+      <i class="ti ti-arrows-exchange"></i>Arbitrage
+    </button>
+    <button class="nav-btn" onclick="showSection('portfolio',this)">
+      <i class="ti ti-briefcase"></i>Portfolio
+    </button>
+    <button class="nav-btn" onclick="showSection('history',this)">
+      <i class="ti ti-history"></i>Historique
+    </button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div id="sec-dashboard" class="section active">
+
+    <!-- PLACED BANNER (hidden by default) -->
+    <div class="placed-banner" id="placed-banner" style="display:none">
+      <i class="ti ti-circle-check placed-icon"></i>
+      <div class="placed-text">
+        <div class="placed-title">667€ placés cette année</div>
+        <div class="placed-sub" id="placed-sub">+ 1 807€ d'abondement</div>
+      </div>
+    </div>
+
+    <!-- ANALYSIS BAR -->
+    <div class="analysis-bar" id="analysis-status">
+      <i class="ti ti-info-circle"></i>
+      Cliquez sur "Analyser" pour obtenir le score du jour
+    </div>
+    <div id="debug-panel" style="display:none;background:#1a1e28;border:0.5px solid rgba(251,191,36,0.3);border-radius:12px;padding:12px;margin-bottom:12px;font-family:monospace;font-size:11px;color:#fbbf24;white-space:pre-wrap;max-height:200px;overflow-y:auto"></div>
+    <button id="debug-btn" onclick="toggleDebug()" style="display:none;width:100%;padding:8px;background:transparent;border:0.5px solid rgba(255,255,255,0.1);border-radius:8px;color:var(--text3);font-size:11px;cursor:pointer;margin-bottom:8px">
+      <i class="ti ti-bug"></i> Afficher les logs de diagnostic
+    </button>
+
+    <!-- SCORE HERO -->
+    <div class="score-hero" id="score-hero">
+      <div class="score-date mono" id="score-date">En attente d'analyse...</div>
+      <div class="score-circle" id="score-circle">
+        <span class="score-number" id="score-num">--</span>
+        <span class="score-label">/100</span>
+      </div>
+      <div class="score-verdict" id="score-verdict">Score du jour</div>
+      <div class="score-desc" id="score-desc">Analysez les marchés pour obtenir la recommandation</div>
+      <div class="tags" id="score-tags"></div>
+    </div>
+
+    <!-- ANALYZE BUTTON -->
+    <button class="btn btn-primary" id="analyze-btn" onclick="analyzeMarkets()">
+      <i class="ti ti-search"></i> Analyser les marchés maintenant
+    </button>
+
+    <!-- PLACEMENT CARD -->
+    <div class="card" id="placement-card" style="display:none">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-cash"></i> Placement annuel</div>
+        <span class="badge" id="placement-badge">En cours</span>
+      </div>
+      <div class="action-box">
+        <div class="action-title">RÉPARTITION SUR EPSOR</div>
+        <div class="action-row">
+          <span class="action-fund">Amundi Label Equilibre ESR</span>
+          <span class="action-pct">35%</span>
+        </div>
+        <div class="action-row">
+          <span class="action-fund">DPAM Europe Index B</span>
+          <span class="action-pct">25%</span>
+        </div>
+        <div class="action-row">
+          <span class="action-fund">DPAM US Index B</span>
+          <span class="action-pct">20%</span>
+        </div>
+        <div class="action-row">
+          <span class="action-fund">DPAM Emerging Index B</span>
+          <span class="action-pct">10%</span>
+        </div>
+        <div class="action-row">
+          <span class="action-fund">ES Ofi Obligations Europe</span>
+          <span class="action-pct">10%</span>
+        </div>
+        <div class="action-steps" id="placement-steps">
+          <div class="action-step">
+            <div class="step-num">1</div>
+            <span>Aller sur Epsor > Versement volontaire</span>
+          </div>
+          <div class="action-step">
+            <div class="step-num">2</div>
+            <span>Montant : <strong>667€</strong></span>
+          </div>
+          <div class="action-step">
+            <div class="step-num">3</div>
+            <span>Appliquer la répartition ci-dessus</span>
+          </div>
+          <div class="action-step">
+            <div class="step-num">4</div>
+            <span>Valider → Recevoir <strong>1 807€</strong> d'abondement</span>
+          </div>
+          <div class="action-step">
+            <div class="step-num">5</div>
+            <span>Revenir ici et confirmer</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-copy" onclick="copyAllocation()">
+        <i class="ti ti-copy"></i> Copier la répartition
+      </button>
+      <button class="btn btn-primary" id="btn-placed" onclick="markAsPlaced()">
+        <i class="ti ti-check"></i> C'est fait ! 667€ placés
+      </button>
+    </div>
+
+    <!-- FORECASTS (shown after analysis) -->
+    <div class="card" id="forecast-card" style="display:none">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-telescope"></i> Prévision 7 jours</div>
+      </div>
+      <div class="forecast-row">
+        <div class="forecast-col">
+          <div class="forecast-pct green" id="fc-up">--%</div>
+          <div class="forecast-label">hausse</div>
+        </div>
+        <div class="forecast-col">
+          <div class="forecast-pct" style="color:var(--red)" id="fc-down">--%</div>
+          <div class="forecast-label">baisse</div>
+        </div>
+        <div class="forecast-col">
+          <div class="forecast-pct" style="color:var(--amber)" id="fc-vol">--</div>
+          <div class="forecast-label">volatilité</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ICS BUTTONS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-calendar"></i> Rappels Outlook</div>
+      </div>
+      <div class="ics-info">
+        Importez ces fichiers dans Outlook ou Google Calendar pour ne jamais oublier votre check quotidien.
+      </div>
+      <button class="btn btn-secondary" onclick="generateICS('daily')" style="margin-top:12px">
+        <i class="ti ti-calendar-plus"></i> Créer rappels quotidiens 8h30 (lun-ven)
+      </button>
+      <button class="btn btn-secondary" onclick="generateICS('cancel')">
+        <i class="ti ti-calendar-minus"></i> Supprimer tous les rappels 2026
+      </button>
+      <button class="btn btn-secondary" onclick="generateICS('rebalance')">
+        <i class="ti ti-calendar-event"></i> Rappel rééquilibrage annuel (1er jan)
+      </button>
+    </div>
+
+  </div>
+
+  <!-- REBALANCE -->
+  <div id="sec-rebalance" class="section">
+
+    <!-- CREDITS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-credit-card"></i> Crédits arbitrage 2026</div>
+        <span class="badge badge-green" id="credits-badge">4/4</span>
+      </div>
+      <div class="credits-row" id="credits-dots"></div>
+      <div class="stat-row">
+        <span class="stat-label">Crédits utilisés</span>
+        <span class="stat-value mono" id="credits-used-label">0 / 4</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Prochain crédit</span>
+        <span class="stat-value blue" id="next-credit-date">--</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Seuil d'alerte</span>
+        <span class="stat-value mono">Score > 75/100</span>
+      </div>
+    </div>
+
+    <!-- REBALANCE SCORE -->
+    <div class="card" id="rebal-score-card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-arrows-exchange"></i> Score rééquilibrage</div>
+        <span class="badge badge-gray" id="rebal-score-badge">--/100</span>
+      </div>
+      <div style="font-size:12px; color:var(--text2)">
+        Entrez la répartition actuelle de votre portefeuille pour obtenir une analyse.
+      </div>
+    </div>
+
+    <!-- PORTFOLIO INPUT -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-adjustments"></i> Répartition actuelle</div>
+        <span style="font-size:11px; color:var(--text3)" id="total-pct">Total: 0%</span>
+      </div>
+      <div id="portfolio-inputs"></div>
+      <div class="stat-row" style="margin-top:8px">
+        <span class="stat-label" style="font-size:12px">Capital total (optionnel, pour voir les €)</span>
+      </div>
+      <div class="fund-input-row" style="margin-top:8px">
+        <input type="number" class="fund-input" id="capital-total" placeholder="ex: 10000" oninput="updatePortfolio()">
+        <span class="pct-suffix">€</span>
+      </div>
+      <button class="btn btn-primary" style="margin-top:16px" onclick="analyzeRebalance()">
+        <i class="ti ti-search"></i> Analyser le rééquilibrage
+      </button>
+    </div>
+
+    <!-- REBALANCE RECOMMENDATION -->
+    <div class="card" id="rebal-recommendation" style="display:none">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-bulb"></i> Recommandation</div>
+        <span class="badge" id="rebal-rec-badge">--</span>
+      </div>
+      <div id="rebal-rec-content"></div>
+    </div>
+
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div id="sec-portfolio" class="section">
+
+    <!-- SUMMARY -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-wallet"></i> Synthèse portefeuille</div>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Capital actuel</span>
+        <span class="stat-value blue mono" id="perf-capital" style="color:var(--text3)">Non renseigné</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Total investi</span>
+        <span class="stat-value mono" id="perf-total">0€</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Plus-value réelle</span>
+        <span class="stat-value mono" id="perf-pv">--</span>
+      </div>
+      <div style="height:0.5px;background:var(--border);margin:4px 0"></div>
+      <div class="stat-row">
+        <span class="stat-label" style="display:flex;align-items:center;gap:6px">
+          Objectif 31/12/<span id="perf-year">2026</span>
+          <span style="font-size:16px">🥕</span>
+        </span>
+        <span class="stat-value mono" id="perf-target" style="color:var(--amber)">--</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Plus-value estimée</span>
+        <span class="stat-value mono" id="perf-pv-est" style="color:var(--amber)">--</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Jours restants</span>
+        <span class="stat-value mono" id="perf-days" style="color:var(--text2)">--</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Versements cumulés (vous)</span>
+        <span class="stat-value green mono" id="perf-yours">0€</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Abondement reçu</span>
+        <span class="stat-value green mono" id="perf-abond">0€</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Multiplicateur</span>
+        <span class="stat-value amber mono" id="perf-multi">--</span>
+      </div>
+    </div>
+
+    <!-- PROJECTION -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-trending-up"></i> Projection</div>
+        <span class="badge badge-blue">6.75% net/an</span>
+      </div>
+      <div id="projection-base" style="font-size:11px;color:var(--amber);margin-bottom:12px;font-family:'DM Mono',monospace">
+        Renseignez votre capital en page Arbitrage pour une projection précise
+      </div>
+      <table class="rebal-table">
+        <thead>
+          <tr>
+            <th>Horizon</th>
+            <th>Vos versements</th>
+            <th>Capital estimé</th>
+            <th>Multiplicateur</th>
+          </tr>
+        </thead>
+        <tbody id="projection-table"></tbody>
+      </table>
+    </div>
+
+    <!-- ALLOCATION TARGET -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-chart-donut"></i> Allocation cible</div>
+        <span class="badge badge-green">TFE: 0.73%</span>
+      </div>
+      <table class="rebal-table">
+        <thead>
+          <tr><th>Fonds</th><th>Cible</th><th>Frais</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="fund-name">Amundi Label Equilibre ESR</div><div class="fund-short">Diversifié flexible</div></td>
+            <td><span class="badge badge-blue">35%</span></td>
+            <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent)">0.54%</span></td>
+          </tr>
+          <tr>
+            <td><div class="fund-name">DPAM Europe Index B</div><div class="fund-short">ETF Europe MSCI</div></td>
+            <td><span class="badge badge-blue">25%</span></td>
+            <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent)">0.81%</span></td>
+          </tr>
+          <tr>
+            <td><div class="fund-name">DPAM US Index B</div><div class="fund-short">ETF USA MSCI</div></td>
+            <td><span class="badge badge-blue">20%</span></td>
+            <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent)">0.72%</span></td>
+          </tr>
+          <tr>
+            <td><div class="fund-name">DPAM Emerging Index B</div><div class="fund-short">ETF Émergents MSCI</div></td>
+            <td><span class="badge badge-blue">10%</span></td>
+            <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--amber)">1.05%</span></td>
+          </tr>
+          <tr>
+            <td><div class="fund-name">ES Ofi Obligations Europe</div><div class="fund-short">Obligations zone Euro</div></td>
+            <td><span class="badge badge-blue">10%</span></td>
+            <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent)">0.93%</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- HISTORY -->
+  <div id="sec-history" class="section">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="ti ti-history"></i> Historique 2026</div>
+        <button class="badge badge-red" style="border:none;cursor:pointer;font-size:10px" onclick="clearHistory()">Effacer</button>
+      </div>
+      <div id="history-list">
+        <div style="text-align:center;padding:30px;font-size:13px;color:var(--text3)">
+          Aucune action enregistrée
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <div class="modal-title">
+      Paramètres
+      <i class="ti ti-x modal-close" onclick="closeSettings()"></i>
+    </div>
+
+    <div class="section-title">DONNÉES DE MARCHÉ</div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Clé Alpha Vantage</div>
+          <div class="setting-sub">Gratuit · 25 appels/jour · CAC40, S&P500, VIX</div>
+        </div>
+        <a href="https://alphavantage.co/support/#api-key" target="_blank"
+           style="font-size:10px;color:var(--blue);text-decoration:none;font-family:'DM Mono',monospace">
+          Obtenir →
+        </a>
+      </div>
+      <input type="password" class="api-input" id="alpha-api-key"
+        placeholder="Votre clé Alpha Vantage..."
+        oninput="saveSetting('alphaVantageKey', this.value)">
+      <div id="alpha-key-status" style="font-size:11px;margin-top:6px;font-family:'DM Mono',monospace;color:var(--text3)">
+        Entrez votre clé pour activer les données réelles
+      </div>
+    </div>
+
+    <div class="section-title">ANALYSE IA</div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">HuggingFace FinBERT</div>
+          <div class="setting-sub">Actif par défaut · Gratuit · 1000 appels/mois · 70% précision</div>
+        </div>
+        <div class="toggle" id="toggle-hf" onclick="toggleSetting('hf')">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Claude API</div>
+          <div class="setting-sub">Payant · ~5€/mois · 75% précision</div>
+        </div>
+        <div class="toggle" id="toggle-claude" onclick="toggleSetting('claude')">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+      <div id="claude-key-section" style="display:none">
+        <input type="password" class="api-input" id="claude-api-key"
+          placeholder="sk-ant-..." oninput="saveSetting('claudeKey', this.value)">
+      </div>
+    </div>
+
+    <div class="section-title">ARBITRAGE</div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Arbitrages max par an</div>
+          <div class="setting-sub">Recommandé : 4</div>
+        </div>
+        <select class="select-small" id="max-arbitrage" onchange="saveSetting('maxArbitrage', this.value)">
+          <option value="2">2</option>
+          <option value="4" selected>4</option>
+          <option value="6">6</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Seuil d'alerte rééquilibrage</div>
+          <div class="setting-sub">Score minimum pour alerter</div>
+        </div>
+        <select class="select-small" id="rebal-threshold" onchange="saveSetting('rebalThreshold', this.value)">
+          <option value="65">65</option>
+          <option value="70">70</option>
+          <option value="75" selected>75</option>
+          <option value="80">80</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Écart minimum pour alerter</div>
+          <div class="setting-sub">Dérive vs cible</div>
+        </div>
+        <select class="select-small" id="drift-threshold" onchange="saveSetting('driftThreshold', this.value)">
+          <option value="5">±5%</option>
+          <option value="7" selected>±7%</option>
+          <option value="10">±10%</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section-title">INFORMATIONS</div>
+    <div class="card">
+      <div class="stat-row">
+        <span class="stat-label">Versement annuel</span>
+        <span class="stat-value green mono">667€</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Abondement</span>
+        <span class="stat-value green mono">1 807€</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Rendement cible</span>
+        <span class="stat-value mono">6.75% net/an</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">TFE moyen</span>
+        <span class="stat-value mono">0.73%/an</span>
+      </div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="closeSettings()" style="margin-top:8px">Fermer</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+
+<script>
+var debugLogs = [];
+function dlog(msg) {
+  debugLogs.push(new Date().toISOString().slice(11,19) + ' ' + msg);
+  var panel = document.getElementById('debug-panel');
+  if (panel) panel.textContent = debugLogs.slice(-30).join('\n');
+}
+function toggleDebug() {
+  var panel = document.getElementById('debug-panel');
+  var btn = document.getElementById('debug-btn');
+  if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  if (btn) btn.textContent = panel.style.display === 'none' ? '🐛 Afficher logs' : '🐛 Masquer logs';
+}
+
+
+// Safari-compatible fetch with timeout
+function fetchWithTimeout(url, options, ms) {
+  ms = ms || 8000;
+  var controller = new AbortController();
+  var timer = setTimeout(function() { controller.abort(); }, ms);
+  var opts = Object.assign({}, options || {}, { signal: controller.signal });
+  return fetch(url, opts).finally(function() { clearTimeout(timer); });
+}
+
+
+
+const FUNDS = [
+  { key: 'amundi', name: 'Amundi Label Equilibre ESR', short: 'Diversifié', target: 35, fee: 0.54 },
+  { key: 'dpam_eu', name: 'DPAM Europe Index B', short: 'ETF Europe', target: 25, fee: 0.81 },
+  { key: 'dpam_us', name: 'DPAM US Index B', short: 'ETF USA', target: 20, fee: 0.72 },
+  { key: 'dpam_em', name: 'DPAM Emerging Index B', short: 'ETF Émergents', target: 10, fee: 1.05 },
+  { key: 'esofi', name: 'ES Ofi Obligations Europe', short: 'Obligations', target: 10, fee: 0.93 }
+];
+
+let state = JSON.parse(localStorage.getItem('pee_state') || '{}');
+state = {
+  placed: false, placedDate: null, placements: [],
+  arbitrages: [], portfolio: {}, capitalTotal: 0,
+  settings: { hf: true, claude: false, claudeKey: '', alphaVantageKey: '', maxArbitrage: 4, rebalThreshold: 75, driftThreshold: 7 },
+  lastAnalysis: null, history: [],
+  ...state
+};
+
+function save() { localStorage.setItem('pee_state', JSON.stringify(state)); }
+
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'portfolio') renderPortfolio();
+  if (id === 'history') renderHistory();
+  if (id === 'rebalance') renderRebalance();
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function openSettings() { document.getElementById('settings-modal').classList.add('open'); loadSettings(); }
+function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
+
+function loadSettings() {
+  const s = state.settings;
+  document.getElementById('toggle-hf').classList.toggle('on', s.hf);
+  document.getElementById('toggle-claude').classList.toggle('on', s.claude);
+  document.getElementById('claude-key-section').style.display = s.claude ? 'block' : 'none';
+  if (s.claudeKey) document.getElementById('claude-api-key').value = s.claudeKey;
+  var alphaInput = document.getElementById('alpha-api-key');
+  if (alphaInput) alphaInput.value = s.alphaVantageKey || '';
+  var alphaStatus = document.getElementById('alpha-key-status');
+  if (alphaStatus) {
+    if (s.alphaVantageKey) {
+      alphaStatus.textContent = '✅ Clé enregistrée - données réelles activées';
+      alphaStatus.style.color = 'var(--accent)';
+    } else {
+      alphaStatus.textContent = 'Entrez votre clé pour activer les données réelles';
+      alphaStatus.style.color = 'var(--text3)';
+    }
+  }
+  document.getElementById('max-arbitrage').value = s.maxArbitrage;
+  document.getElementById('rebal-threshold').value = s.rebalThreshold;
+  document.getElementById('drift-threshold').value = s.driftThreshold;
+}
+
+function toggleSetting(key) {
+  if (key === 'hf') {
+    state.settings.hf = !state.settings.hf;
+    document.getElementById('toggle-hf').classList.toggle('on', state.settings.hf);
+  }
+  if (key === 'claude') {
+    state.settings.claude = !state.settings.claude;
+    document.getElementById('toggle-claude').classList.toggle('on', state.settings.claude);
+    document.getElementById('claude-key-section').style.display = state.settings.claude ? 'block' : 'none';
+  }
+  save();
+}
+
+function saveSetting(key, value) {
+  state.settings[key] = isNaN(value) ? value : Number(value);
+  save();
+  if (key === 'alphaVantageKey') {
+    var alphaStatus = document.getElementById('alpha-key-status');
+    if (alphaStatus) {
+      if (value && value.length > 5) {
+        alphaStatus.textContent = '✅ Clé enregistrée - données réelles activées';
+        alphaStatus.style.color = 'var(--accent)';
+      } else {
+        alphaStatus.textContent = 'Entrez votre clé pour activer les données réelles';
+        alphaStatus.style.color = 'var(--text3)';
+      }
+    }
+  }
+}
+
+function now() {
+  const d = new Date();
+  return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function formatDate(d) { return new Date(d).toLocaleDateString('fr-FR'); }
+
+document.getElementById('topbar-date').textContent = now();
+
+function checkPlaced() {
+  const yr = new Date().getFullYear();
+  const placed = state.placements.find(p => new Date(p.date).getFullYear() === yr);
+  const banner = document.getElementById('placed-banner');
+  const btn = document.getElementById('btn-placed');
+  const badge = document.getElementById('placement-badge');
+  const card = document.getElementById('placement-card');
+  card.style.display = 'block';
+  if (placed) {
+    banner.style.display = 'flex';
+    document.getElementById('placed-sub').textContent = `Placé le ${formatDate(placed.date)} + 1 807€ d'abondement`;
+    btn.style.display = 'none';
+    badge.textContent = 'Fait ✓';
+    badge.className = 'badge badge-green';
+  } else {
+    banner.style.display = 'none';
+    btn.style.display = 'flex';
+    badge.textContent = 'En attente';
+    badge.className = 'badge badge-amber';
+  }
+}
+
+checkPlaced();
+
+async function analyzeMarkets(forceRefresh = false) {
+  const btn = document.getElementById('analyze-btn');
+  const today = new Date().toISOString().slice(0, 10);
+
+  // CACHE 24H : si analyse déjà faite aujourd'hui et pas de forceRefresh
+  if (!forceRefresh && state.lastAnalysis && state.lastAnalysis.date === today) {
+    displayScore(state.lastAnalysis);
+    document.getElementById('analysis-status').innerHTML =
+      '<i class="ti ti-clock"></i> Score du jour déjà calculé — ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+    btn.innerHTML = '<i class="ti ti-refresh"></i> Forcer une nouvelle analyse';
+    btn.onclick = () => analyzeMarkets(true);
+    btn.disabled = false;
+    return;
+  }
+
+  btn.innerHTML = '<div class="spinner"></div> Analyse en cours...';
+  btn.disabled = true;
+  document.getElementById('analysis-status').innerHTML = '<div class="spinner"></div> Récupération des données de marché réelles...';
+  debugLogs = [];
+  dlog('=== Analyse démarrée ==='  );
+  dlog('Safari: ' + /Safari/.test(navigator.userAgent));
+  dlog('AbortController: ' + (typeof AbortController !== 'undefined'));
+  dlog('Key set: ' + !!state.settings.alphaVantageKey);
+  document.getElementById('debug-btn').style.display = 'block';
+  document.getElementById('debug-panel').style.display = 'block';
+
+  // Récupère vraies données marché
+  const marketData = await fetchRealMarketData();
+
+  document.getElementById('analysis-status').innerHTML = '<div class="spinner"></div> Analyse IA en cours (HuggingFace)...';
+
+  // HuggingFace activé par défaut, Claude en option
+  let result;
+  if (state.settings.claude && state.settings.claudeKey) {
+    result = await analyzeWithClaude(marketData);
+  } else {
+    result = await analyzeWithHuggingFace(marketData);
+  }
+
+  result.date = today;
+  state.lastAnalysis = result;
+  save();
+  displayScore(result);
+
+  btn.innerHTML = '<i class="ti ti-refresh"></i> Forcer une nouvelle analyse';
+  btn.onclick = () => analyzeMarkets(true);
+  btn.disabled = false;
+  document.getElementById('analysis-status').innerHTML =
+    '<i class="ti ti-check"></i> Analyse mise à jour — ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+}
+
+async function fetchRealMarketData() {
+  const results = {};
+  const apiKey = state.settings.alphaVantageKey || '';
+  dlog('fetchRealMarketData start, key: ' + (apiKey ? apiKey.slice(0,4)+'...' : 'NONE'));
+
+  if (!apiKey) {
+    dlog('ERROR: No Alpha Vantage key');
+    ['EU','US','VOL'].forEach(r => {
+      results[r] = { label: r, change: 0, value: 0, available: false, reason: 'Clé Alpha Vantage manquante' };
+    });
+    return results;
+  }
+
+  // Alpha Vantage symbols
+  const indices = [
+    { symbol: 'EWQ',  label: 'CAC 40 (EWQ)',  region: 'EU'  },
+    { symbol: 'SPY',  label: 'S&P 500 (SPY)', region: 'US'  },
+    { symbol: 'VIXY', label: 'VIX (VIXY)',     region: 'VOL' }
+  ];
+
+  for (const idx of indices) {
+    try {
+      const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${idx.symbol}&apikey=${apiKey}`;
+      const res = await fetchWithTimeout(url, {}, 8000);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const quote = data['Global Quote'];
+      if (data['Information']) {
+        throw new Error('RATE LIMIT - attendez 1 min');
+      } else if (data['Note']) {
+        throw new Error('Limite atteinte');
+      } else if (quote && quote['05. price']) {
+        var price  = parseFloat(quote['05. price']);
+        var change = parseFloat((quote['10. change percent']||'0%').replace('%',''));
+        results[idx.region] = { label: idx.label, change: change, value: price, available: true };
+        dlog(idx.label + ' OK: ' + price.toFixed(2) + ' chg:' + change.toFixed(2));
+        fetched = true;
+      } else if (quote && Object.keys(quote).length === 0) {
+        throw new Error('Symbole vide - verifiez symbol');
+      } else {
+        throw new Error('Format inattendu: ' + JSON.stringify(data).slice(0,60));
+      }
+    } catch(e) {
+      dlog('ERROR ' + idx.label + ': ' + e.name + ' - ' + e.message);
+      if (idx.region === 'US') {
+        try {
+          dlog('US fallback: trying SPY directly');
+          const url2 = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=SPY&apikey=${apiKey}`;
+          const res2 = await fetchWithTimeout(url2, {}, 8000);
+          const data2 = await res2.json();
+          const q2 = data2['Global Quote'];
+          if (q2 && q2['05. price']) {
+            results[idx.region] = {
+              label: 'S&P 500 (SPY)',
+              change: parseFloat(q2['10. change percent'].replace('%','')),
+              value: parseFloat(q2['05. price']),
+              available: true
+            };
+            continue;
+          }
+        } catch(e2) {}
+      }
+      results[idx.region] = { label: idx.label, change: 0, value: 0, available: false };
+    }
+  }
+  return results;
+}
+
+
+async function analyzeWithHuggingFace(marketData) {
+  const score = computeBaseScore(marketData);
+  const tags = score.tags;
+  const reasons = score.reasons;
+  let finalScore = score.value;
+  const marketSummary = buildMarketSummary(marketData);
+
+  const hfUrl = 'https://api-inference.huggingface.co/models/ProsusAI/finbert';
+  const hfBody = JSON.stringify({ inputs: marketSummary });
+
+  const proxies = [
+    // Direct (works on some networks)
+    async () => fetch(hfUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: hfBody,
+      signal: (function(){ var c=new AbortController(); setTimeout(function(){c.abort();},8000); return c.signal; })()
+    }),
+    // Via allorigins (POST workaround)
+    async () => fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(hfUrl)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: hfBody,
+      signal: (function(){ var c=new AbortController(); setTimeout(function(){c.abort();},8000); return c.signal; })()
+    }),
+    // Via corsproxy
+    async () => fetch(`https://corsproxy.io/?${encodeURIComponent(hfUrl)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: hfBody,
+      signal: (function(){ var c=new AbortController(); setTimeout(function(){c.abort();},8000); return c.signal; })()
+    })
+  ];
+
+  let hfSuccess = false;
+  for (const tryProxy of proxies) {
+    if (hfSuccess) break;
+    try {
+      const res = await tryProxy();
+      if (!res.ok) continue;
+      const data = await res.json();
+      let adjustment = 0;
+      const sentiments = Array.isArray(data[0]) ? data[0] : (Array.isArray(data) ? data : []);
+      sentiments.forEach(s => {
+        if (s.label === 'positive') adjustment += Math.round(s.score * 12);
+        if (s.label === 'negative') adjustment -= Math.round(s.score * 12);
+      });
+      finalScore = Math.min(Math.max(finalScore + adjustment, 10), 95);
+      const dominant = sentiments.sort((a,b) => b.score - a.score)[0];
+      if (dominant) {
+        const labelFr = dominant.label === 'positive' ? 'positif'
+          : dominant.label === 'negative' ? 'négatif' : 'neutre';
+        tags.push({ t: 'FinBERT: ' + labelFr,
+          c: dominant.label === 'positive' ? 'pos'
+           : dominant.label === 'negative' ? 'neg' : 'neu' });
+      }
+      tags.push({ t: 'HuggingFace actif', c: 'pos' });
+      hfSuccess = true;
+    } catch(e) { /* try next */ }
+  }
+
+  if (!hfSuccess) {
+    tags.push({ t: 'HF hors ligne', c: 'neg' });
+    reasons.push('HuggingFace indisponible — score basé sur données de marché uniquement');
+  }
+
+  const vix = marketData.VOL?.value || 18;
+  const upProb = Math.min(Math.max(30 + finalScore * 0.4, 20), 80);
+  return {
+    score: Math.round(finalScore), tags, reasons,
+    forecast: {
+      up: Math.round(upProb),
+      down: Math.round(100 - upProb),
+      vol: vix > 22 ? 'Élevée' : vix < 15 ? 'Faible' : 'Moyenne'
+    },
+    marketData, mode: hfSuccess ? 'huggingface' : 'algo'
+  };
+}
+
+
+async function analyzeWithClaude(marketData) {
+  const base = await analyzeWithHuggingFace(marketData);
+  try {
+    const today = new Date().toLocaleDateString('fr-FR');
+    const summary = buildMarketSummary(marketData);
+    const prompt = `Tu es un analyste financier expert. Nous sommes le ${today}.
+Données de marché actuelles : ${summary}
+Analyse ces conditions pour un investisseur PEE long terme (fonds diversifiés Europe/US/Emergents/Obligations).
+Réponds UNIQUEMENT avec un JSON valide sans markdown :
+{"scoreAdjustment": number -15 à +15, "marketSummary": "string 15 mots max", "mainSignal": "positif"|"neutre"|"négatif", "forecastBias": number -10 à +10}`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': state.settings.claudeKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 150, messages: [{ role: 'user', content: prompt }] }),
+      signal: (function(){ var c=new AbortController(); setTimeout(function(){c.abort();},10000); return c.signal; })()
+    });
+    if (!res.ok) throw new Error('Claude error');
+    const data = await res.json();
+    const json = JSON.parse((data.content[0]?.text || '{}').replace(/```json|```/g,'').trim());
+    base.score = Math.min(Math.max(Math.round(base.score + (json.scoreAdjustment || 0)), 10), 95);
+    if (json.marketSummary) base.reasons.unshift(json.marketSummary);
+    if (json.forecastBias) {
+      base.forecast.up = Math.min(Math.max(base.forecast.up + json.forecastBias, 20), 80);
+      base.forecast.down = 100 - base.forecast.up;
+    }
+    const sig = json.mainSignal;
+    base.tags.push({ t: 'Claude: ' + (sig||'neutre'), c: sig === 'positif' ? 'pos' : sig === 'négatif' ? 'neg' : 'neu' });
+    base.tags.push({ t: 'Claude API actif', c: 'pos' });
+    base.mode = 'claude';
+  } catch(e) {
+    base.tags.push({ t: 'Claude API erreur', c: 'neg' });
+  }
+  return base;
+}
+
+function computeBaseScore(marketData) {
+  let score = 50;
+  const tags = [];
+  const reasons = [];
+  const month = new Date().getMonth();
+
+  // Saisonnalité
+  const goodMonths = [0, 1, 9, 10, 11];
+  const badMonths = [4, 5];
+  if (goodMonths.includes(month)) {
+    score += 10;
+    tags.push({ t: 'Saison favorable', c: 'pos' });
+    reasons.push('Période historiquement favorable aux marchés');
+  } else if (badMonths.includes(month)) {
+    score -= 8;
+    tags.push({ t: 'Sell in May', c: 'neg' });
+    reasons.push('Période historiquement plus prudente (mai-juin)');
+  }
+
+  // CAC 40
+  if (marketData.EU?.available) {
+    const ch = marketData.EU.change;
+    if (ch < -2) { score += 14; tags.push({ t: `CAC ${ch.toFixed(1)}%`, c: 'pos' }); reasons.push(`CAC 40 en baisse (${ch.toFixed(1)}%) = opportunité d'achat`); }
+    else if (ch < 0) { score += 6; tags.push({ t: `CAC ${ch.toFixed(1)}%`, c: 'pos' }); reasons.push(`Légère baisse du CAC 40 (${ch.toFixed(1)}%)`); }
+    else if (ch > 2) { score -= 8; tags.push({ t: `CAC +${ch.toFixed(1)}%`, c: 'neg' }); reasons.push(`CAC 40 en hausse (${ch.toFixed(1)}%) = marché potentiellement cher`); }
+    else { tags.push({ t: `CAC +${ch.toFixed(1)}%`, c: 'neu' }); }
+  } else { tags.push({ t: 'CAC indisponible', c: 'neu' }); }
+
+  // S&P 500
+  if (marketData.US?.available) {
+    const ch = marketData.US.change;
+    if (ch < -2) { score += 14; tags.push({ t: `S&P ${ch.toFixed(1)}%`, c: 'pos' }); reasons.push(`S&P 500 en correction (${ch.toFixed(1)}%) = bon point d'entrée`); }
+    else if (ch < 0) { score += 5; tags.push({ t: `S&P ${ch.toFixed(1)}%`, c: 'pos' }); }
+    else if (ch > 2) { score -= 8; tags.push({ t: `S&P +${ch.toFixed(1)}%`, c: 'neg' }); reasons.push(`S&P 500 en hausse (${ch.toFixed(1)}%) = vigilance`); }
+    else { tags.push({ t: `S&P +${ch.toFixed(1)}%`, c: 'neu' }); }
+  } else { tags.push({ t: 'S&P indisponible', c: 'neu' }); }
+
+  // VIX
+  if (marketData.VOL?.available) {
+    const vix = marketData.VOL.value;
+    if (vix > 25) { score += 14; tags.push({ t: `VIX ${vix.toFixed(0)}`, c: 'pos' }); reasons.push(`VIX élevé (${vix.toFixed(0)}) = panique = opportunité d'achat`); }
+    else if (vix > 20) { score += 7; tags.push({ t: `VIX ${vix.toFixed(0)}`, c: 'pos' }); reasons.push(`VIX modéré-élevé (${vix.toFixed(0)}) = légère incertitude`); }
+    else if (vix < 13) { score -= 10; tags.push({ t: `VIX ${vix.toFixed(0)}`, c: 'neg' }); reasons.push(`VIX très bas (${vix.toFixed(0)}) = complaisance des marchés`); }
+    else { tags.push({ t: `VIX ${vix.toFixed(0)}`, c: 'neu' }); }
+  } else { tags.push({ t: 'VIX indisponible', c: 'neu' }); }
+
+  return { value: Math.min(Math.max(score, 10), 95), tags, reasons };
+}
+
+function buildMarketSummary(marketData) {
+  const parts = [];
+  if (marketData.EU?.available) parts.push(`CAC 40: ${marketData.EU.change > 0 ? '+' : ''}${marketData.EU.change.toFixed(2)}%`);
+  if (marketData.US?.available) parts.push(`S&P 500: ${marketData.US.change > 0 ? '+' : ''}${marketData.US.change.toFixed(2)}%`);
+  if (marketData.VOL?.available) parts.push(`VIX: ${marketData.VOL.value.toFixed(1)}`);
+  return parts.length ? parts.join(', ') + '. European and US equity markets update.' : 'Mixed equity market conditions with moderate volatility.';
+}
+
+function displayScore(r) {
+  const circle = document.getElementById('score-circle');
+  const num = document.getElementById('score-num');
+  const verdict = document.getElementById('score-verdict');
+  const desc = document.getElementById('score-desc');
+  const tagsEl = document.getElementById('score-tags');
+  const fc = document.getElementById('forecast-card');
+
+  num.textContent = r.score;
+  circle.className = 'score-circle';
+  verdict.className = 'score-verdict';
+
+  if (r.score >= 75) {
+    circle.classList.add('');
+    verdict.classList.add('green');
+    verdict.textContent = 'BON MOMENT POUR PLACER';
+    desc.textContent = r.reasons[0] || 'Conditions de marché favorables';
+    document.getElementById('score-date').textContent = 'Recommandation : PLACER vos 667€ maintenant';
+  } else if (r.score >= 50) {
+    circle.classList.add('orange');
+    verdict.classList.add('orange');
+    verdict.textContent = 'CONDITIONS CORRECTES';
+    desc.textContent = r.reasons[0] || 'Conditions neutres, vous pouvez attendre mieux';
+    document.getElementById('score-date').textContent = 'Recommandation : Attendre une meilleure opportunité';
+  } else {
+    circle.classList.add('red-c');
+    verdict.classList.add('red-v');
+    verdict.textContent = 'ATTENDRE';
+    desc.textContent = r.reasons[0] || 'Marchés défavorables pour un placement';
+    document.getElementById('score-date').textContent = 'Recommandation : Patienter, risque élevé';
+  }
+
+  tagsEl.innerHTML = r.tags.map(t => `<span class="tag ${t.c}">${t.t}</span>`).join('');
+  fc.style.display = 'block';
+  document.getElementById('fc-up').textContent = r.forecast.up + '%';
+  document.getElementById('fc-down').textContent = r.forecast.down + '%';
+  document.getElementById('fc-vol').textContent = r.forecast.vol;
+}
+
+function markAsPlaced() {
+  const yr = new Date().getFullYear();
+  state.placements = state.placements.filter(p => new Date(p.date).getFullYear() !== yr);
+  state.placements.push({ date: new Date().toISOString(), amount: 667, abond: 1807 });
+  addHistory('placement', 'Placement 667€ effectué', '+ 1 807€ abondement reçu');
+  save();
+  checkPlaced();
+  toast('Placement enregistré ! Abondement de 1 807€ en route.');
+}
+
+function copyAllocation() {
+  const text = '35% Amundi Label Equilibre ESR\n25% DPAM Europe Index B\n20% DPAM US Index B\n10% DPAM Emerging Index B\n10% ES Ofi Obligations Europe';
+  navigator.clipboard.writeText(text).then(() => toast('Répartition copiée !')).catch(() => toast('Copie manuelle : ' + text));
+}
+
+function addHistory(type, action, detail) {
+  state.history.unshift({ type, action, detail, date: new Date().toISOString() });
+  if (state.history.length > 50) state.history.pop();
+  save();
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (!state.history.length) {
+    list.innerHTML = '<div style="text-align:center;padding:30px;font-size:13px;color:var(--text3)">Aucune action enregistrée</div>';
+    return;
+  }
+  const icons = { placement:'ti-cash', arbitrage:'ti-arrows-exchange', analyse:'ti-search' };
+  list.innerHTML = state.history.map(h => `
+    <div class="history-item">
+      <div class="history-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <i class="ti ${icons[h.type]||'ti-activity'}" style="font-size:16px;color:var(--text3)"></i>
+          <span class="history-action">${h.action}</span>
+        </div>
+        <span class="history-date">${formatDate(h.date)}</span>
+      </div>
+      <div class="history-detail">${h.detail}</div>
+    </div>
+  `).join('');
+}
+
+function clearHistory() {
+  if (!confirm('Effacer tout l\'historique ?')) return;
+  state.history = [];
+  save();
+  renderHistory();
+  toast('Historique effacé');
+}
+
+function renderRebalance() {
+  const max = state.settings.maxArbitrage || 4;
+  const used = state.arbitrages.filter(a => new Date(a.date).getFullYear() === new Date().getFullYear()).length;
+  const avail = max - used;
+
+  document.getElementById('credits-badge').textContent = `${avail}/${max}`;
+  document.getElementById('credits-badge').className = avail > 0 ? 'badge badge-green' : 'badge badge-red';
+  document.getElementById('credits-used-label').textContent = `${used} / ${max}`;
+
+  const quarters = ['1er avril','1er juillet','1er octobre','1er janvier'];
+  const now = new Date();
+  let nextQ = '';
+  if (now.getMonth() < 3) nextQ = '1er avril ' + now.getFullYear();
+  else if (now.getMonth() < 6) nextQ = '1er juillet ' + now.getFullYear();
+  else if (now.getMonth() < 9) nextQ = '1er octobre ' + now.getFullYear();
+  else nextQ = '1er janvier ' + (now.getFullYear()+1);
+  document.getElementById('next-credit-date').textContent = avail > 0 ? 'Disponible maintenant' : nextQ;
+
+  const dots = document.getElementById('credits-dots');
+  dots.innerHTML = Array.from({length:max}, (_,i) =>
+    `<div class="credit-dot ${i < used ? 'credit-used' : 'credit-avail'}">
+      <i class="ti ${i < used ? 'ti-x' : 'ti-check'}"></i>
+    </div>`
+  ).join('');
+
+  if (!document.getElementById('portfolio-inputs').children.length) buildPortfolioInputs();
+}
+
+function buildPortfolioInputs() {
+  const container = document.getElementById('portfolio-inputs');
+  container.innerHTML = FUNDS.map(f => `
+    <div class="input-group">
+      <div class="input-label">
+        <span>${f.name}</span>
+        <span class="input-target">Cible: ${f.target}%</span>
+      </div>
+      <div class="fund-input-row">
+        <input type="number" class="fund-input" id="inp_${f.key}"
+          placeholder="ex: ${f.target}" min="0" max="100" step="0.1"
+          oninput="updatePortfolio()" value="${state.portfolio[f.key]||''}">
+        <span class="pct-suffix">%</span>
+        <span class="input-diff" id="diff_${f.key}"></span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updatePortfolio() {
+  let total = 0;
+  FUNDS.forEach(f => {
+    const v = parseFloat(document.getElementById('inp_'+f.key)?.value || 0) || 0;
+    state.portfolio[f.key] = v;
+    total += v;
+    const diff = v - f.target;
+    const el = document.getElementById('diff_'+f.key);
+    if (el && v > 0) {
+      if (diff > 0) el.innerHTML = `<span style="color:var(--red)">+${diff.toFixed(1)}%</span>`;
+      else if (diff < 0) el.innerHTML = `<span style="color:var(--accent)">${diff.toFixed(1)}%</span>`;
+      else el.innerHTML = `<span style="color:var(--text3)">✓</span>`;
+    }
+  });
+  document.getElementById('total-pct').textContent = `Total: ${total.toFixed(1)}%`;
+  const capital = parseFloat(document.getElementById('capital-total')?.value) || 0;
+  state.capitalTotal = capital;
+  save();
+}
+
+function analyzeRebalance() {
+  const max = state.settings.maxArbitrage || 4;
+  const used = state.arbitrages.filter(a => new Date(a.date).getFullYear() === new Date().getFullYear()).length;
+  const avail = max - used;
+  const threshold = state.settings.driftThreshold || 7;
+  const capital = state.capitalTotal;
+
+  let maxDrift = 0;
+  let drifters = [];
+  FUNDS.forEach(f => {
+    const v = state.portfolio[f.key] || 0;
+    const drift = Math.abs(v - f.target);
+    if (drift > threshold) { drifters.push({...f, current: v, drift, over: v > f.target}); }
+    if (drift > maxDrift) maxDrift = drift;
+  });
+
+  const rebalScore = Math.min(Math.round(30 + maxDrift * 5 + (drifters.length * 8)), 95);
+  const scoreEl = document.getElementById('rebal-score-badge');
+  scoreEl.textContent = rebalScore + '/100';
+
+  const card = document.getElementById('rebal-recommendation');
+  const content = document.getElementById('rebal-rec-content');
+  const badge = document.getElementById('rebal-rec-badge');
+  card.style.display = 'block';
+
+  if (!drifters.length) {
+    badge.textContent = 'Équilibré';
+    badge.className = 'badge badge-green';
+    scoreEl.className = 'badge badge-green';
+    content.innerHTML = `
+      <div style="text-align:center;padding:20px">
+        <i class="ti ti-circle-check" style="font-size:32px;color:var(--accent)"></i>
+        <div style="margin-top:12px;font-size:14px;font-weight:600">Portefeuille bien équilibré</div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text2)">Tous les fonds sont dans la cible (±${threshold}%).<br>Aucun arbitrage nécessaire.</div>
+      </div>`;
+    return;
+  }
+
+  if (avail <= 0) {
+    badge.textContent = '0 crédit';
+    badge.className = 'badge badge-red';
+    scoreEl.className = 'badge badge-amber';
+    content.innerHTML = `
+      <div style="padding:12px;background:rgba(248,113,113,0.08);border-radius:10px;border:0.5px solid rgba(248,113,113,0.2);margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--red)">Aucun crédit disponible</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Vous avez utilisé vos ${max} arbitrages pour cette année.</div>
+      </div>
+      <div style="font-size:12px;color:var(--text2)">Prochains crédits au 1er trimestre suivant.</div>`;
+    return;
+  }
+
+  const sells = drifters.filter(d => d.over).sort((a,b) => b.drift - a.drift);
+  const buys = drifters.filter(d => !d.over).sort((a,b) => b.drift - a.drift);
+
+  let rebalHtml = '';
+
+  if (sells.length) {
+    rebalHtml += `<div style="margin-bottom:12px"><div class="action-title" style="color:var(--red)">VENDRE (sur-pondérés)</div>`;
+    sells.forEach(f => {
+      const sellPct = f.current - f.target;
+      const sellEur = capital ? Math.round(capital * sellPct / 100) : null;
+      rebalHtml += `
+        <div class="action-row">
+          <span class="action-fund">${f.name}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--red)">
+            ${f.current.toFixed(1)}% → ${f.target}% ${sellEur ? `(${sellEur}€)` : ''}
+          </span>
+        </div>`;
+    });
+    rebalHtml += '</div>';
+  }
+
+  if (buys.length) {
+    rebalHtml += `<div style="margin-bottom:12px"><div class="action-title" style="color:var(--accent)">ACHETER (sous-pondérés)</div>`;
+    buys.forEach(f => {
+      const buyPct = f.target - f.current;
+      const buyEur = capital ? Math.round(capital * buyPct / 100) : null;
+      rebalHtml += `
+        <div class="action-row">
+          <span class="action-fund">${f.name}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)">
+            ${f.current.toFixed(1)}% → ${f.target}% ${buyEur ? `(+${buyEur}€)` : ''}
+          </span>
+        </div>`;
+    });
+    rebalHtml += '</div>';
+  }
+
+  rebalHtml += `
+    <div class="action-box">
+      <div class="action-title">ÉTAPES SUR EPSOR</div>
+      <div class="action-step"><div class="step-num">1</div><span>Mes placements → Arbitrage</span></div>
+      <div class="action-step"><div class="step-num">2</div><span>Vendre les fonds sur-pondérés (voir ci-dessus)</span></div>
+      <div class="action-step"><div class="step-num">3</div><span>Racheter immédiatement en respectant les % cibles</span></div>
+      <div class="action-step"><div class="step-num">4</div><span>Valider et revenir ici confirmer</span></div>
+    </div>`;
+
+  rebalHtml += `
+    <button class="btn btn-copy" onclick="copyRebalance()" style="margin-top:8px">
+      <i class="ti ti-copy"></i> Copier l'arbitrage
+    </button>
+    <button class="btn btn-primary" onclick="confirmArbitrage()">
+      <i class="ti ti-check"></i> C'est fait (utilise 1 crédit)
+    </button>`;
+
+  if (rebalScore >= 75) {
+    badge.textContent = 'Agir maintenant';
+    badge.className = 'badge badge-red';
+    scoreEl.className = 'badge badge-red';
+  } else {
+    badge.textContent = 'Surveiller';
+    badge.className = 'badge badge-amber';
+    scoreEl.className = 'badge badge-amber';
+  }
+
+  content.innerHTML = rebalHtml;
+}
+
+function copyRebalance() {
+  let text = 'ARBITRAGE PEE\n\n';
+  FUNDS.forEach(f => {
+    const v = state.portfolio[f.key] || 0;
+    const drift = v - f.target;
+    if (Math.abs(drift) > (state.settings.driftThreshold || 7)) {
+      text += drift > 0 ? `VENDRE: ${f.name} (${v}% → ${f.target}%)\n` : `ACHETER: ${f.name} (${v}% → ${f.target}%)\n`;
+    }
+  });
+  navigator.clipboard.writeText(text).then(() => toast('Arbitrage copié !')).catch(() => toast('Copie effectuée'));
+}
+
+function confirmArbitrage() {
+  const max = state.settings.maxArbitrage || 4;
+  const used = state.arbitrages.filter(a => new Date(a.date).getFullYear() === new Date().getFullYear()).length;
+  if (used >= max) { toast('Plus de crédits disponibles'); return; }
+  const changes = FUNDS.map(f => {
+    const v = state.portfolio[f.key] || 0;
+    return `${f.name}: ${v}% → ${f.target}%`;
+  }).join(' | ');
+  state.arbitrages.push({ date: new Date().toISOString(), details: changes });
+  addHistory('arbitrage', 'Rééquilibrage effectué', changes.split(' | ').slice(0,2).join(' | '));
+  save();
+  renderRebalance();
+  document.getElementById('rebal-recommendation').style.display = 'none';
+  toast('Arbitrage enregistré ! 1 crédit utilisé.');
+}
+
+
+function renderPortfolio() {
+  let totalVersed = 0;
+  let totalAbond = 0;
+  state.placements.forEach(function(p) {
+    totalVersed += p.amount || 667;
+    totalAbond += p.abond || 1807;
+  });
+  var totalInvested = totalVersed + totalAbond;
+  var capitalActuel = state.capitalTotal || 0;
+  var rate = 0.0675;
+  var versementAnnuel = 2474;
+  var now = new Date();
+  var yr = now.getFullYear();
+  var pvReelle = capitalActuel - totalInvested;
+  var pvReellePct = totalInvested > 0 ? (pvReelle / totalInvested * 100) : 0;
+  var endOfYear = new Date(yr, 11, 31);
+  var daysLeft = Math.max(0, Math.round((endOfYear - now) / 86400000));
+  var fractionYear = daysLeft / 365;
+  var targetEndYear = capitalActuel > 0 ? capitalActuel * Math.pow(1 + rate, fractionYear) : 0;
+  var pvEstimee = targetEndYear - capitalActuel;
+  var pvEsteePct = capitalActuel > 0 ? (pvEstimee / capitalActuel * 100) : 0;
+  var multi = totalVersed > 0 ? (totalInvested / totalVersed).toFixed(1) + 'x' : '--';
+
+  function setEl(id, val, color) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = val; if (color) el.style.color = color; }
+  }
+
+  var yearEl = document.getElementById('perf-year');
+  if (yearEl) yearEl.textContent = yr;
+
+  var capitalEl = document.getElementById('perf-capital');
+  if (capitalEl) {
+    capitalEl.textContent = capitalActuel > 0 ? capitalActuel.toLocaleString('fr-FR') + '€' : 'Non renseigné';
+    capitalEl.style.color = capitalActuel > 0 ? 'var(--blue)' : 'var(--text3)';
+  }
+
+  setEl('perf-total', totalInvested.toLocaleString('fr-FR') + '€');
+  setEl('perf-yours', totalVersed.toLocaleString('fr-FR') + '€');
+  setEl('perf-abond', totalAbond.toLocaleString('fr-FR') + '€');
+  setEl('perf-multi', multi);
+  setEl('perf-days', daysLeft + ' jours');
+
+  var pvEl = document.getElementById('perf-pv');
+  if (pvEl) {
+    if (capitalActuel > 0 && totalInvested > 0) {
+      var sign = pvReelle >= 0 ? '+' : '';
+      pvEl.textContent = sign + Math.round(pvReelle).toLocaleString('fr-FR') + '€ (' + sign + pvReellePct.toFixed(1) + '%)';
+      pvEl.style.color = pvReelle >= 0 ? 'var(--accent)' : 'var(--red)';
+    } else {
+      pvEl.textContent = '--';
+      pvEl.style.color = 'var(--text3)';
+    }
+  }
+
+  var targetEl = document.getElementById('perf-target');
+  var pvEstEl = document.getElementById('perf-pv-est');
+  if (targetEl) targetEl.textContent = capitalActuel > 0 ? Math.round(targetEndYear).toLocaleString('fr-FR') + '€' : '--';
+  if (pvEstEl) {
+    if (capitalActuel > 0) {
+      pvEstEl.textContent = '+' + Math.round(pvEstimee).toLocaleString('fr-FR') + '€ (+' + pvEsteePct.toFixed(1) + '%)';
+      pvEstEl.style.color = 'var(--amber)';
+      pvEstEl.style.fontSize = '';
+    } else {
+      pvEstEl.textContent = 'Renseignez votre capital en Arbitrage';
+      pvEstEl.style.color = 'var(--text3)';
+      pvEstEl.style.fontSize = '11px';
+    }
+  }
+
+  var baseInfo = document.getElementById('projection-base');
+  if (baseInfo) {
+    baseInfo.textContent = capitalActuel > 0
+      ? 'Base : ' + capitalActuel.toLocaleString('fr-FR') + '€ actuels + 2 474€/an'
+      : 'Renseignez votre capital en page Arbitrage pour une projection précise';
+    baseInfo.style.color = capitalActuel > 0 ? 'var(--text2)' : 'var(--amber)';
+  }
+
+  var rows = [5, 10, 15, 20].map(function(years) {
+    var capital = capitalActuel;
+    for (var i = 1; i <= years; i++) capital = (capital + versementAnnuel) * (1 + rate);
+    var vosVersements = 667 * years;
+    var m = vosVersements > 0 ? (capital / vosVersements).toFixed(1) : '--';
+    return '<tr><td><span class="badge badge-gray">' + years + ' ans</span></td>' +
+      '<td style="font-family:DM Mono,monospace;font-size:12px">' + vosVersements.toLocaleString('fr-FR') + '€</td>' +
+      '<td style="font-family:DM Mono,monospace;font-size:12px;color:var(--accent)">' + Math.round(capital).toLocaleString('fr-FR') + '€</td>' +
+      '<td style="font-family:DM Mono,monospace;font-size:12px;color:var(--amber)">×' + m + '</td></tr>';
+  });
+  var projTable = document.getElementById('projection-table');
+  if (projTable) projTable.innerHTML = rows.join('');
+}
+
+function generateICS(type) {
+  let content = '';
+  const yr = new Date().getFullYear();
+
+  if (type === 'daily') {
+    content = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PEE Optimizer//FR
+X-WR-CALNAME:PEE Optimizer - Rappels
+BEGIN:VEVENT
+UID:pee-daily-2026@optimizer
+DTSTART;TZID=Europe/Paris:${yr}0102T083000
+DTEND;TZID=Europe/Paris:${yr}0102T083500
+RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;UNTIL=${yr}1231T235959Z
+SUMMARY:PEE - Check quotidien
+DESCRIPTION:Ouvrir PEE Optimizer et analyser le score du jour\\nObjectif : placer 667€ au meilleur moment\\nAbondement : 1 807€ offerts par l'entreprise\\nAllocation cible : 35% Amundi | 25% DPAM EU | 20% DPAM US | 10% EM | 10% ES Ofi
+CATEGORIES:PEE,Finance
+BEGIN:VALARM
+TRIGGER:-PT0M
+ACTION:DISPLAY
+DESCRIPTION:PEE - Analyser le marché maintenant
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+    downloadICS(content, `pee-rappels-quotidiens-${yr}.ics`);
+    toast('Rappels quotidiens créés !');
+  }
+
+  if (type === 'cancel') {
+    content = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PEE Optimizer//FR
+BEGIN:VEVENT
+UID:pee-daily-2026@optimizer
+DTSTART;TZID=Europe/Paris:${yr}0102T083000
+DTEND;TZID=Europe/Paris:${yr}0102T083500
+RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;UNTIL=${yr}1231T235959Z
+SUMMARY:PEE - Check quotidien
+STATUS:CANCELLED
+SEQUENCE:1
+END:VEVENT
+END:VCALENDAR`;
+    downloadICS(content, `pee-annulation-rappels-${yr}.ics`);
+    toast('Fichier d\'annulation téléchargé !');
+  }
+
+  if (type === 'rebalance') {
+    const nextYr = yr + 1;
+    content = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//PEE Optimizer//FR
+BEGIN:VEVENT
+UID:pee-rebalance-annual@optimizer
+DTSTART;TZID=Europe/Paris:${nextYr}0102T090000
+DTEND;TZID=Europe/Paris:${nextYr}0102T093000
+SUMMARY:PEE - Rééquilibrage annuel
+DESCRIPTION:Ouvrir PEE Optimizer\\nSaisir la répartition actuelle de chaque fonds\\nVérifier les écarts vs cible (35/25/20/10/10)\\nEffectuer les arbitrages si nécessaire\\nPlacer les 667€ pour la nouvelle année
+CATEGORIES:PEE,Finance
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Demain : Rééquilibrage PEE !
+END:VALARM
+END:VEVENT
+END:VCALENDAR`;
+    downloadICS(content, `pee-reequilibrage-${nextYr}.ics`);
+    toast('Rappel rééquilibrage créé !');
+  }
+}
+
+function downloadICS(content, filename) {
+  const blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+renderPortfolio();
+if (state.lastAnalysis) displayScore(state.lastAnalysis);
+
+
+// PASSWORD PROTECTION v3
+(function() {
+  const PWD = btoa('Epsor#667');
+  const KEY = 'pee_v3';
+  let tries = 0;
+
+  function showApp() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+  }
+
+  function checkAuth() {
+    try {
+      if (localStorage.getItem(KEY) === PWD || sessionStorage.getItem(KEY) === PWD) {
+        showApp(); return true;
+      }
+    } catch(e) {}
+    return false;
+  }
+
+  window.tryLogin = function() {
+    if (tries >= 5) return;
+    const input = document.getElementById('login-input');
+    const val = (input.value || '').trim();
+    if (!val) return;
+    if (btoa(val) === PWD) {
+      try {
+        const rem = document.getElementById('remember-me').checked;
+        if (rem) localStorage.setItem(KEY, PWD);
+        else sessionStorage.setItem(KEY, PWD);
+      } catch(e) {}
+      showApp();
+    } else {
+      tries++;
+      input.value = '';
+      input.classList.add('error');
+      setTimeout(() => input.classList.remove('error'), 400);
+      document.getElementById('login-error').textContent = 'Mot de passe incorrect (' + tries + '/5)';
+      if (tries >= 5) {
+        document.querySelector('.login-btn').disabled = true;
+        document.getElementById('login-error').textContent = 'Bloque - rechargez la page';
+      }
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!checkAuth()) document.getElementById('login-screen').style.display = 'flex';
+    });
+  } else {
+    if (!checkAuth()) document.getElementById('login-screen').style.display = 'flex';
+  }
+})();
+
+</script>
+</body>
+</html>
